@@ -1,10 +1,22 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include "../../sdk/dexsdk.h"
+
+int strtoint(const char *str){
+    int i = strlen(str) - 1 , i2 = 1;
+    int num = 0;
+    for (;i>=0; i--)
+      {
+        if ( (str[i]>='0') && (str[i]<='9') )
+        {
+            num += (str[i]-'0') * i2;
+            i2*=10;
+        };
+      };
+    return num;
+};
 
 int display_menu(){
     char ch[1];
+    int choice;
 
     printf("\n\tDeal or No Deal\n\n");
     printf("\n\t[1] Start Game");
@@ -12,9 +24,9 @@ int display_menu(){
     printf("\n\t[3] High Scores");
     printf("\n\t[4] Exit");
     printf("\n\n\tChoice: ");
-    scanf("%s", ch);    
+    fgets(ch, 1, stdin);
 
-    return atoi(ch);  // Converting string to int
+    return strtoint(ch);  // Converting string to int
 }
 
 void initializeCases(int cases[]) {
@@ -68,18 +80,23 @@ void display_amount(int amounts[]) {
 }
 
 int get_case_choice() {
-    int choice;
+    char choice[2];
+    int ch;
 
     do {
         printf("\n\n\tChoose your case: ");
-        scanf("%d", &choice);
+        fgets(choice, 2, stdin);
 
-        if (choice < 1 || choice > 26) {
+        printf("--%s\n", choice);
+        ch = strtoint(choice);
+        printf("--%d\n", ch);
+
+        if (ch < 1 || ch > 26) {
             printf("\n\tInvalid input!\n");
         }
-    } while (choice < 1 || choice > 26);
+    } while (ch < 1 || ch > 26);
 
-    return choice;
+    return ch;
 }
 
 void reveal_case(int cases[], int caseNum) {
@@ -88,7 +105,9 @@ void reveal_case(int cases[], int caseNum) {
 }
 
 void get_cases(int cases[], int amounts[], int turn, int caseChoice, int nChoice) {
-    int i, j, choice, n = nChoice;
+    int i, j, n = nChoice;
+    char choice[2];
+    int ch;
 
     for (i = 0; i < n; i++, nChoice--) {
         do {
@@ -98,32 +117,32 @@ void get_cases(int cases[], int amounts[], int turn, int caseChoice, int nChoice
             display_cases(cases, caseChoice);
             printf("\n\tChoice left: %d\n", nChoice);
             printf("\tChoose a case: ");
-            scanf("%d", &choice);
-
+            fgets(choice, 2, stdin);
+            ch = strtoint(choice);
+            printf("\n%d\n", ch);
             if (   
-                caseChoice == choice ||
-                choice < 1 || 
-                choice > 26 || 
-                cases[choice - 1] == 0
+                caseChoice == ch ||
+                ch < 1 || 
+                ch > 26 || 
+                cases[ch - 1] == 0
             ) {
                 printf("\n\tInvalid input!\n");
             }
         } while (
-            choice == caseChoice ||
-            choice < 1 || 
-            choice > 26 || 
-            cases[choice - 1] == 0
+            ch == caseChoice ||
+            ch < 1 || 
+            ch > 26 || 
+            cases[ch - 1] == 0
         );
         
-        system("clear");
-        reveal_case(cases, choice);
+        reveal_case(cases, ch);
 
         for (j = 0; j < 26; j++) {
-            if (amounts[j] == cases[choice - 1]) {
+            if (amounts[j] == cases[ch - 1]) {
                 amounts[j] = 0;
             }
         }
-        cases[choice - 1] = 0;
+        cases[ch - 1] = 0;
     }
 }
 
@@ -146,7 +165,9 @@ int banker_offer(int cases[], int turn) {
 }
 
 void end_game(int cases[], int caseChoice) {
-    int i, choice, choice2;
+    int i, choice2;
+    char choice[2];
+    int ch;
 
     for (i = 0; i < 26; i++) {
         if ((cases[i] > 0) && (i != (caseChoice - 1))) {
@@ -157,19 +178,18 @@ void end_game(int cases[], int caseChoice) {
     do {
         printf("\n\n\t[%d]  [%d]", caseChoice, choice2);
         printf("\nChoose your case: ");
-        scanf("%d", &choice);
+        fgets(choice, 2, stdin);
+        ch = strtoint(choice);
 
 
-        if (choice == caseChoice) {
-            system("clear");
+        if (ch == caseChoice) {
             printf("\n\n\tYou have won $%d!\n", cases[caseChoice - 1]);
             break;
         } else {
-            system("clear");
             printf("\n\n\tYou have won $%d!\n", cases[choice2 - 1]);
             break;
         }
-    } while(choice != caseChoice || choice != choice2);   
+    } while(ch != caseChoice || ch != choice2);   
 }
 
 void start_game() {
@@ -179,7 +199,8 @@ void start_game() {
     int amounts[26] = {1, 5, 10, 15, 25, 50, 75, 100, 200, 300, 400, 500, 750, 1000, 
                         5000, 10000, 25000, 50000, 75000, 100000, 200000, 300000, 
                         400000, 500000, 750000, 1000000};
-    int turn = 0, nChoice = 6, caseChoice = 0, choice, offer;
+    int turn = 0, nChoice = 6, caseChoice = 0, offer;
+    char choice[2];
 
     printf("\n\tDeal or No Deal!\n"); 
     printf("\n\tChoose a suitcase and find out \n\tif you're about to win a virtual fortune.");
@@ -192,7 +213,6 @@ void start_game() {
     turn++;
 
     while (1) {
-        system("clear");
         get_cases(cases, amounts, turn, caseChoice, nChoice);
         printf("\n\n\tRound %d\n", turn);
         printf("\n\tYour Case: %d\n", caseChoice);
@@ -203,10 +223,9 @@ void start_game() {
         printf("\n\t[1] Deal");
         printf("\n\t[2] No Deal");
         printf("\n\tDeal or No Deal? ");
-        scanf("%d", &choice);
+        fgets(choice, 1, stdin);
 
-        if (choice == 1) {
-            system("clear");
+        if (choice == "1") {
             printf("\n\tYou have won $%d\n", offer);
             break;
         }
@@ -230,7 +249,7 @@ void display_instructions() {
 
     printf("\n\n\tINSTRUCTIONS\n");
     printf("\n\t[1] Go back to Menu?\n\tChoice: ");
-    scanf("%s", y);
+    fgets(y, 1, stdin);
 }
 
 void display_high_scores() {
@@ -241,8 +260,6 @@ void display_high_scores() {
 void exit_game() {
     printf("\n\n\n\t\tThanks for playing! See you again!\n");
     printf("\n\t\tExiting game...\n");
-    sleep(2);
-    system("clear");
 
     exit(0);
 }
