@@ -50,20 +50,19 @@ void erase(int x, int y, int w, int h, int color){ //basically covers an area wi
          write_pixel(j,i,color);
 }
 
-int showBankersOffer(int cases[], int caseChoice, int turn){ //pass amount parameter
-    int i, j, currentChoice, total, amount, n, average;
+int showBankersOffer(int cases[], int amount, int turn){ //pass amount parameter
+    int i, j, currentChoice, total, n, average;
     char keypress;
     char offer[50];
 
     currentChoice = 0;
     total = 0;
-    amount = cases[caseChoice - 1];
     n = 0;
     average = 0;
 
 
     for(i = 0 ;  i < 26; i++){
-        if(cases[i] > 0 && i != caseChoice){
+        if(cases[i] > 0){
             total = amount + cases[i];
             n++;
         }
@@ -358,7 +357,7 @@ void drawGame(){
     int amounts[26] = {1, 5, 10, 15, 25, 50, 75, 100, 200, 300, 400, 500, 750, 1000, 
                         5000, 10000, 25000, 50000, 75000, 100000, 200000, 300000, 
                         400000, 500000, 750000, 1000000};
-    int turn = 0, nChoice = 6, caseChoice = 0, choice, decision;          
+    int turn = 0, nChoice = 6, caseChoice = 0, amountChoice = 0, choice, decision;          
 
     int i, j;
     int remainingCases[26], remainingAmounts[26];
@@ -377,6 +376,8 @@ void drawGame(){
     write_text("Choose a briefcase to",65,168, WHITE,0);
     write_text("start:", 70, 180, WHITE, 0);
     caseChoice = getCaseChoice(remainingCases);
+    amountChoice = cases[caseChoice - 1];
+    cases[caseChoice - 1] = 0;
     remainingCases[caseChoice - 1] = 0;
     erase(58,164,204,30,BLACK);
     drawBriefcase(30, 19, 67, 170, caseChoice, 0, 1); //chosen briefcase
@@ -386,7 +387,7 @@ void drawGame(){
         drawBoard(remainingCases, remainingAmounts);
         getCases(cases, amounts, nChoice, remainingCases, remainingAmounts);
 
-        decision = showBankersOffer(cases, caseChoice, turn);
+        decision = showBankersOffer(cases, amountChoice, turn);
         erase(58,3,204,158,BLACK);
 
         if (decision == 0) {
@@ -406,6 +407,19 @@ void drawGame(){
         turn++;
     }
 
+}
+
+void drawInstructions(){
+    char keypress;
+
+    erase(0,0,320,220, BLACK);
+    write_text("Use up, down, left, and right keys", 10, 50, WHITE, 0);
+    write_text("to navigate. Press Esc to exit", 10, 80, WHITE, 0);
+    write_text("game", 10, 110, WHITE, 0);
+    write_text("<press enter to go back to menu_>", 15, 170, WHITE, 0);
+    do keypress=(char)getch();
+    while(keypress!=enter);
+    erase(0,0,320,220, BLACK);
 }
 
 void drawMenu(){        
@@ -430,22 +444,26 @@ void drawMenu(){
         keypress=(char)getch();
         
         if(keypress == up_key){
-            if(currentChoice == 0) currentChoice = 4;
+            if(currentChoice == 0) currentChoice = 3;
             else currentChoice--;
         }else if(keypress == down_key){
-            if(currentChoice == 4) currentChoice = 0;
+            if(currentChoice == 3) currentChoice = 0;
             else currentChoice++;
         }else if(keypress == enter){
             if(currentChoice == 0){
                 drawGame();
                 erase(0,0,320,220, BLACK);
             } 
-            /*else if(currentChoice == 1) drawInstructions();
-            else if(currentChoice == 2) drawHighScores();*/
-            else if(currentChoice == 3) break;
+            else if(currentChoice == 1) drawInstructions();
+            /*else if(currentChoice == 2) drawHighScores();*/
+            else if(currentChoice == 3){
+                set_graphics(VGA_TEXT80X25X16);
+                clrscr();
+                exit(0);
+            }
         }
 
-    }while(keypress != quit);
+    }while(keypress != quit);   
 
 }
 
@@ -457,17 +475,7 @@ int main(){
     set_graphics(VGA_320X200X256);
     //Clear the screen first
     erase(0,0,320,220, BLACK);
-    //For checking all available colors, uncomment the code below
-    // char str[50];
-    // int i, j, n = 0;
-    // for(i = 0; i < 300; i+=30){
-    //  for(j = 0; j < 200; j+=20){
-    //      sprintf(str, "%d", n);
-    //      write_text(str, i, j, n, 0);
-    //      n++;
-    //  }
-    // }
-    //Draws the intro screen
+    
     drawMenu();
     
     //Return ICS-OS graphics before exiting
