@@ -41,7 +41,6 @@ void initializeCases(int cases[]) {
     }
 }
 
-
 //"Erases" the screen given the starting point and the width & height
 void erase(int x, int y, int w, int h, int color){ //basically covers an area with a black rectangle 
    int i,j;
@@ -63,12 +62,12 @@ int showBankersOffer(int cases[], int amount, int turn){ //pass amount parameter
 
     for(i = 0 ;  i < 26; i++){
         if(cases[i] > 0){
-            total = amount + cases[i];
+            total = total + cases[i];
             n++;
         }
     }
     
-    average = amount + total/ n;
+    average = (amount + total)/ n;
     total = average * turn / 10;
 
     /*for(i=58; i<=262; i++){ //vertical show
@@ -422,7 +421,7 @@ void drawInstructions(){
     erase(0,0,320,220, BLACK);
 }
 
-void drawMenu(){        
+void drawMenu() {        
     int currentChoice = 0;
     char keypress;
     
@@ -467,7 +466,7 @@ void drawMenu(){
 
 }
 
-int main(){
+int main() {
 
     char keypress;
 
